@@ -5,3 +5,7 @@
 Как с этим работать:<br><br>
 python3 li.py URL -m [количество итераций int]<br>
 python3 li.py http://site.com/ -m 0<br>
+<br><br>
+По итогу создается текстовых файла:<br>
+[site-name]_internal_link.txt - ссылки страницы что удалось обойти<br>
+[site-name]_internal_file_link.txt - ссылки на файлы<br>

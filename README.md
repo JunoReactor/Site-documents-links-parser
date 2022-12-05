@@ -4,7 +4,8 @@
 
 Как с этим работать:<br><br>
 python3 li.py URL -m [количество итераций int]<br>
-python3 li.py http://site.com/ -m 0<br>
+python3 li.py http://site.com/ -m 0  -s 0.3<br>
+python3 li.py http://site.com/ --max-urls 0  --sleep 0.3<br>
 <br><br>
 По итогу создается текстовых файла:<br>
 [site-name]_internal_link.txt - ссылки страницы что удалось обойти<br>

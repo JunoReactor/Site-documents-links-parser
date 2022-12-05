@@ -12,7 +12,7 @@ python3 li.py http://site.com/ --max-urls 0  --sleep 0.3<br>
 ```
 <br><br>
 ## По итогу создается текстовых файла:<br>
-| Plugin | README |
+| LOG файл | Описание |
 | ------ | ------ |
 | [site-name]_internal_link.txt | ссылки страницы что удалось обойти |
 | [site-name]_internal_file_link.txt | ссылки на файлы |

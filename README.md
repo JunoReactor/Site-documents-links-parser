@@ -6,9 +6,9 @@
 
 ## Как с этим работать:<br><br>
 ```sh
-python3 li.py URL -m [количество итераций int]<br>
-python3 li.py http://site.com/ -m 0  -s 0.3<br>
-python3 li.py http://site.com/ --max-urls 0  --sleep 0.3<br>
+python3 li.py URL -m [количество итераций int]
+python3 li.py http://site.com/ -m 0  -s 0.3
+python3 li.py http://site.com/ --max-urls 0  --sleep 0.3
 ```
 <br><br>
 ## По итогу создается текстовых файла:<br>

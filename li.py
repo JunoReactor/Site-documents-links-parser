@@ -9,6 +9,7 @@ import urllib
 import colorama
 import requests
 import validators
+import time
  
 urlsCrawl           = list()
 internal_link       = list()
@@ -34,6 +35,7 @@ def crawl(urlopen):
     global max_urls
     global i
     global headers
+    global sleep
     
     if max_urls != 0:
         if i > max_urls:
@@ -117,6 +119,7 @@ def crawl(urlopen):
     # Проходим по urlsPage
     for url in urlsPage:
         if url not in urlsCrawl:
+            time.sleep(sleep)
             crawl(url.strip())
 
 if __name__ == "__main__":
@@ -124,10 +127,12 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Link Extractor Tool with Python")
     parser.add_argument("url", help="URL адрес для извлечения ссылок")
     parser.add_argument("-m", "--max-urls", help="Максимальное число для обхода, по умолчанию 30, 0 - без ограничений", default=30, type=int)
+    parser.add_argument("-s", "--sleep", help="Таймаут для каждой итерации сек, по умолчанию 0.", default=0, type=float)
     
-    args = parser.parse_args()
-    urlopen = args.url
-    max_urls = args.max_urls
+    args        = parser.parse_args()
+    urlopen     = args.url
+    max_urls    = args.max_urls
+    sleep       = args.sleep
 
     purlparse = urlparse(urlopen)
     domain_name = purlparse.netloc
@@ -145,8 +150,9 @@ if __name__ == "__main__":
         for link in internal_link:
             print(link.strip(), file=f)
 
-    print("#################################################")
+
+    print(f"{GRAY}#################################################{RESET}")
     print(f"{CYAN}[*] Обработано внутренних URL адресов: {len(internal_link)}{RESET}")
     print(f"{CYAN}[*] Обработано URL файлов: {len(internal_file_link)}{RESET}")
     print(f"{CYAN}[*] Суммарно URL обработано: {len(internal_link) + len(internal_file_link)}{RESET}")
-    print("#################################################")
+    print(f"{GRAY}#################################################{RESET}")

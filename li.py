@@ -15,7 +15,14 @@ urlsCrawl           = list()
 internal_link       = list()
 internal_file_link  = list()
 external_link       = list()
-headers             = ['application/pdf','application/msword',"application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.openxmlformats-officedocument.wordprocessingml.template","application/vnd.ms-word.document.macroEnabled.12","application/vnd.ms-word.template.macroEnabled.12","image/jpeg","video/mp4","image/png","application/vnd.openxmlformats-officedocument.presentationml.presentation","application/vnd.ms-excel","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","application/zip","image/jpg","application/x-7z-compressed","application/vnd.rar","application/x-rar-compressed","application/octet-stream","application/zip, application/octet-stream", "application/x-zip-compressed", "multipart/x-zip"]
+internal_400_link   = list()
+internal_404_link   = list()
+internal_302_link   = list()
+internal_303_link   = list()
+internal_401_link   = list()
+internal_502_link   = list()
+internal_error_link   = list()
+headers             = ["application/force-download","application/x-compress","application/x-gzip","application/x-zip","application/zip","application/x-tiff","application/tiff","application/compact_pro","application/tif","application/x-tif","image/tif","image/x-tif","image/x-tiff","application/pdf","application/msword","application/vnd.openxmlformats-officedocument.wordprocessingml.document","application/vnd.openxmlformats-officedocument.wordprocessingml.template","application/vnd.ms-word.document.macroEnabled.12","application/vnd.ms-word.template.macroEnabled.12","image/jpeg","video/mp4","image/png","application/vnd.openxmlformats-officedocument.presentationml.presentation","application/vnd.ms-excel","application/vnd.openxmlformats-officedocument.spreadsheetml.sheet","application/zip","image/jpg","application/x-7z-compressed","application/vnd.rar","application/x-rar-compressed","application/octet-stream","application/zip, application/octet-stream", "application/x-zip-compressed", "multipart/x-zip","application/rtf","application/vnd.ms-powerpoint","video/mp4","audio/mpeg","image/gif","application/gzip","text/csv","audio/aac"]
 limit = 5
 i = 1
 
@@ -33,6 +40,13 @@ def crawl(urlopen):
     global internal_file_link
     global internal_link
     global max_urls
+    global internal_400_link
+    global internal_404_link
+    global internal_302_link
+    global internal_303_link
+    global internal_401_link
+    global internal_502_link
+    global internal_error_link
     global i
     global headers
     global sleep
@@ -69,6 +83,8 @@ def crawl(urlopen):
     # Проверяем коды ответов
     try:
         if purlopen.netloc=='' and baseURL != urlopen:
+            if urlopen[0] != '/':
+                urlopen = "/"+urlopen
             requrl = baseURL+urlopen
         else:
             requrl = urlopen
@@ -77,6 +93,23 @@ def crawl(urlopen):
             return
         else:    
             r = requests.head(requrl, allow_redirects=True)
+            if r.status_code == 303:
+                internal_303_link.append(requrl)
+                return
+            if r.status_code == 302:
+                internal_302_link.append(requrl)
+                return
+            if r.status_code == 401:
+                internal_401_link.append(requrl)
+                return
+            if r.status_code == 400:
+                internal_400_link.append(requrl)
+                return
+            if r.status_code == 502:
+                internal_502_link.append(requrl)
+                return
+            if r.status_code == 404:
+                internal_404_link.append(requrl)
             if r.status_code == 200:
                 if r.headers['Content-Type'] in headers:
                     internal_file_link.append(urlopen.replace("%20", " "))
@@ -87,15 +120,33 @@ def crawl(urlopen):
 
     except requests.ConnectionError:
         print(f"{RED}[*] Ошибка подключения: {requrl}{RESET}")
+        internal_error_link.append(requrl)
         return
 
     # Делаем запрос к странице
     try:
         html_page = urllib.request.urlopen(requrl)
+    except UnicodeEncodeError:
+        print(f"{RED}[*] URL не валидный для парсинга: {requrl}{RESET}")
+        internal_error_link.append(requrl)
+        return
+    except UnicodeDecodeError:
+        print(f"{RED}[*] URL не валидный для парсинга: {requrl}{RESET}")
+        internal_error_link.append(requrl)
+        return 
+    except urllib.error.HTTPError:
+        print(f"{RED}[*] URL не валидный для парсинга: {requrl}{RESET}")
+        internal_error_link.append(requrl)
+        return
+    except urllib.error.URLError:
+        print(f"{RED}[*] URL не валидный для парсинга: {requrl}{RESET}")
+        internal_error_link.append(requrl)
+        return 
     except ValueError:
         print(f"{RED}[*] URL не валидный для парсинга: {requrl}{RESET}")
+        internal_error_link.append(requrl)
         return
-
+    
     print(f"{YELLOW}[*] Проверяется: {requrl}{RESET}")
     internal_link.append(requrl.replace("%20", " "))
     i=i+1
@@ -150,9 +201,38 @@ if __name__ == "__main__":
         for link in internal_link:
             print(link.strip(), file=f)
 
+    # Сохраняем
+    with open(f"{domain_name}_internal_302_link.txt", "w") as f:
+        for link in internal_302_link:
+            print(link.strip(), file=f)
+
+    # Сохраняем
+    with open(f"{domain_name}_internal_303_link.txt", "w") as f:
+        for link in internal_303_link:
+            print(link.strip(), file=f)
+
+    # Сохраняем
+    with open(f"{domain_name}_internal_401_link.txt", "w") as f:
+        for link in internal_401_link:
+            print(link.strip(), file=f)
+
+    # Сохраняем
+    with open(f"{domain_name}_internal_404_link.txt", "w") as f:
+        for link in internal_404_link:
+            print(link.strip(), file=f)
+
+    # Сохраняем
+    with open(f"{domain_name}_internal_502_link.txt", "w") as f:
+        for link in internal_502_link:
+            print(link.strip(), file=f) 
 
     print(f"{GRAY}#################################################{RESET}")
     print(f"{CYAN}[*] Обработано внутренних URL адресов: {len(internal_link)}{RESET}")
     print(f"{CYAN}[*] Обработано URL файлов: {len(internal_file_link)}{RESET}")
-    print(f"{CYAN}[*] Суммарно URL обработано: {len(internal_link) + len(internal_file_link)}{RESET}")
+    print(f"{CYAN}[*] Обработано URL 303: {len(internal_302_link)}{RESET}")
+    print(f"{CYAN}[*] Обработано URL 302: {len(internal_303_link)}{RESET}")
+    print(f"{CYAN}[*] Обработано URL 401: {len(internal_401_link)}{RESET}")
+    print(f"{CYAN}[*] Обработано URL 404: {len(internal_404_link)}{RESET}")
+    print(f"{CYAN}[*] Обработано URL 502: {len(internal_502_link)}{RESET}")
+    print(f"{CYAN}[*] Суммарно URL обработано: {len(internal_link) + len(internal_file_link) + len(internal_302_link) + len(internal_303_link) + len(internal_401_link) + len(internal_404_link) + len(internal_502_link)}{RESET}")
     print(f"{GRAY}#################################################{RESET}")

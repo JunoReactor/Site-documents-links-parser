@@ -1,4 +1,4 @@
-# file-download
+# file-link-check
 
 Проверяет коды ответов из URL
 Список URL берется из file_urls.txt

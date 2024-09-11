@@ -162,8 +162,6 @@ def crawl(urlopen):
             urlp = urlparse(href)
             if urlp.netloc=='':
                 urlsPage.append(href)
-            elif urlp.netloc=='old.sibur.ru':
-                urlsPage.append(href)
     
     urlsPage.sort()
 
